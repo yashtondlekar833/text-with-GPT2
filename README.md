@@ -1,95 +1,63 @@
-# -*- coding: utf-8 -*-
-"""GPT-2 Text Generation Project
-Prodigy Infotech Internship — Task 1 (Comillas Negras)
-Author: Yash Arun Tondlekar
-"""
+Objective
 
-# ============================================
-# 🌟 GPT-2 Text Generation Project
-# ============================================
+Train a model to generate coherent and contextually relevant text based on a given prompt using GPT-2, a transformer-based language model developed by OpenAI.
 
-# 🧩 STEP 1 — Install all dependencies
-!pip install -U pip setuptools wheel
-!pip install tokenizers==0.13.3 --only-binary=:all:
-!pip install transformers==4.31.0 datasets torch --quiet
+Description
 
-# 🧩 STEP 2 — Import all libraries
-import os
-os.environ["WANDB_DISABLED"] = "true"  # disable Weights & Biases pop-up
+This project demonstrates fine-tuning and text generation using GPT-2.
+The model learns from custom text data to produce realistic and meaningful sentences that mimic the writing style of the training dataset.
+Once trained, it can generate new text automatically from any starting prompt.
 
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, Trainer, TrainingArguments, DataCollatorForLanguageModeling
-from datasets import Dataset
-import torch
+This project is part of ProDigy Infotech – Task 1 (Comillas Negras).
 
-# 🧠 STEP 3 — Load GPT-2 model & tokenizer
-model_name = "gpt2"
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-model = GPT2LMHeadModel.from_pretrained(model_name)
+Features
 
-# Fix padding token issue
-tokenizer.pad_token = tokenizer.eos_token
-model.config.pad_token_id = model.config.eos_token_id
+Uses GPT-2 (pre-trained Transformer model by OpenAI)
 
-# 📝 STEP 4 — Create your small dataset
-text_data = [
-    "Artificial intelligence is changing the world of technology.",
-    "Machine learning helps computers learn from experience.",
-    "Natural language processing enables communication with computers.",
-    "Data science combines math and coding to solve real problems.",
-    "AI will make automation smarter and more efficient in the future."
-]
+Supports fine-tuning on custom text datasets
 
-dataset = Dataset.from_dict({"text": text_data})
+Generates coherent text sequences based on input prompts
 
-# Tokenize dataset
-def tokenize_function(examples):
-    return tokenizer(examples["text"], truncation=True, padding="max_length", max_length=64)
+Runs easily on Google Colab
 
-tokenized_datasets = dataset.map(tokenize_function, batched=True)
-train_dataset = tokenized_datasets  # using all data for training
+How to Run
 
-data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+Open the notebook Task_01_GPT2_Text_Generation.ipynb in Google Colab.
 
-# ⚙️ STEP 5 — Set training arguments
-training_args = TrainingArguments(
-    output_dir="./results",
-    overwrite_output_dir=True,
-    num_train_epochs=2,
-    per_device_train_batch_size=2,
-    save_steps=500,
-    save_total_limit=2,
-    logging_steps=5,
-)
+Ensure required libraries are installed:
 
-# 🏋️‍♂️ STEP 6 — Train the model
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    data_collator=data_collator,
-)
+pip install transformers torch datasets
 
-print("🚀 Training started... Please wait.")
-trainer.train()
 
-# ✨ STEP 7 — Generate text
-prompt = "Artificial intelligence"
-inputs = tokenizer(prompt, return_tensors="pt")
+Run all cells in order.
 
-outputs = model.generate(
-    **inputs,
-    max_length=80,
-    temperature=0.7,
-    top_p=0.9,
-    do_sample=True
-)
+When prompted, enter a text prompt (for example: "Artificial Intelligence will")
 
-print("\n🧠 Generated Text:\n")
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+The model will generate and print a continuation of that text.
 
-# 💾 STEP 8 — Save model
-model.save_pretrained("./fine_tuned_model")
-tokenizer.save_pretrained("./fine_tuned_model")
+Sample Output
+Enter your prompt: Artificial Intelligence will
+Generated Text: Artificial Intelligence will transform industries, improve healthcare, and create new opportunities for innovation and automation across the world.
 
-print("\n✅ Training complete! Model saved in 'fine_tuned_model' folder.")
-print("🎉 You can now use it to generate custom text!")
+Libraries Used
+
+transformers – for loading GPT-2 model
+
+torch – for model training and inference
+
+datasets – for managing text datasets
+
+Installation
+
+If running locally, install dependencies using:
+
+pip install torch transformers datasets
+
+
+(No manual installation needed when using Google Colab.)
+
+Author
+Yash Tondlekar
+Final Year Engineering Student
+Project: Text Generation using GPT-2
+Organization: ProDigy Infotech
